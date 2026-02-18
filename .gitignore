@@ -1,0 +1,15 @@
+# 환경변수 (민감 정보)
+.env
+
+# Python 가상환경
+venv/
+env/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
