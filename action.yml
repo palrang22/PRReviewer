@@ -1,0 +1,47 @@
+name: 'PR Reviewer'
+description: 'AI-powered Pull Request code review using Claude + MCP'
+author: '팔랑이'
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  
+  anthropic-key:
+    description: 'Anthropic API key'
+    required: true
+  
+  custom-prompt-file:
+    description: 'Path to custom review prompt file (optional)'
+    required: false
+    default: '.pr-reviewer.md'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install anthropic PyGithub python-dotenv
+    
+    - name: Run PR Review
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-key }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        CUSTOM_PROMPT_FILE: ${{ inputs.custom-prompt-file }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        python ${{ github.action_path }}/reviewer/code_reviewer.py
