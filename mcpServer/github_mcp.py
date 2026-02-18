@@ -4,7 +4,10 @@ import os
 
 class GitHubMCP:    
     def __init__(self, access_token: str):
-        self.github = Github(access_token)
+        from github import Auth
+        auth = Auth.Token(access_token)
+        self.github = Github(auth=auth)
+        self.tools = self
         print("✅ GitHub MCP 서버 초기화 완료")
     
     def test_connection(self):
@@ -15,6 +18,29 @@ class GitHubMCP:
         except Exception as e:
             print(f"❌ 연결 실패: {e}")
             return False
+        
+    def _register_tools(self):
+        # Claude가 사용할 수 있는 도구 목록
+        return [
+            {
+                "name": "get_pull_request",
+                "description": "PR 정보와 변경된 파일 diff 조회",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "repo": {
+                            "type": "string",
+                            "description": "저장소 이름 (예: Talet-project/Talet_iOS)"
+                        },
+                        "pr_number": {
+                            "type": "integer",
+                            "description": "PR 번호"
+                        }
+                    },
+                    "required": ["repo", "pr_number"]
+                }
+            }
+        ]
         
     def get_pull_request(self, repo_name: str, pr_number: int):
         try:
