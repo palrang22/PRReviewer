@@ -68,7 +68,8 @@ You are an iOS development expert.
 
 ### 리뷰 결과
 
-![PR Review Example](https://via.placeholder.com/800x400?text=PR+Review+Example)
+[PR Review Example](https://github.com/Talet-project/Talet_iOS/pull/32#issuecomment-3920286667)
+
 ```markdown
 ## 🤖 AI Code Review
 
