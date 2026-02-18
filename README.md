@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - uses: palrang/pr-reviewer@v1
+      - uses: palrang22/PRReviewer@v1
         with:
           anthropic-key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
@@ -92,7 +92,7 @@ LGTM 👍
 
 ### 커스텀 프롬프트 파일 경로 지정
 ```yaml
-- uses: palrang/pr-reviewer@v1
+- uses: palrang22/PRReviewer@v1
   with:
     anthropic-key: ${{ secrets.ANTHROPIC_API_KEY }}
     custom-prompt-file: 'docs/review-guide.md'
@@ -108,8 +108,8 @@ LGTM 👍
 
 ### 로컬 테스트
 ```bash
-git clone https://github.com/palrang/pr-reviewer.git
-cd pr-reviewer
+git clone https://github.com/palrang22/PRReviewer.git
+cd PRReviewer
 
 # .env 파일 생성
 cat > .env << EOF
@@ -130,7 +130,7 @@ MIT License
 ## 👤 Author
 
 **팔랑이**
-- GitHub: [@palrang](https://github.com/palrang)
+- GitHub: [@palrang22](https://github.com/palrang22)
 
 ## 🤝 기여
 
