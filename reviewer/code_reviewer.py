@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from anthropic import Anthropic
@@ -23,24 +24,38 @@ class CodeReviewer:
         
         # Claude에게 리뷰 요청
         messages = [
-            {
-                "role": "user",
-                "content": f"""
-                    당신은 iOS 개발 전문가입니다.
-                    아래 PR을 리뷰해주세요.
+                    {
+                    "role": "user",
+                    "content": f"""
+                        You are my iOS development expert colleague.
 
-                    **저장소**: {repo}
-                    **PR 번호**: {pr_number}
+                        **Repository**: {repo}
+                        **PR Number**: {pr_number}
 
-                    **진행 방법**:
-                    1. get_pull_request 도구로 PR 정보 조회
-                    2. 변경된 코드 분석
-                    3. 리뷰 작성
+                        **Review Process**:
+                        1. Check changes with get_pull_request
+                        2. Analyze modified files
+                        3. **Only when necessary**, investigate related files:
+                        e.g., files with similar patterns
+                        4. Consider overall project structure
+                        5. Provide suggestions if any, otherwise mention good points
+                        6. Follow the important notes below
 
-                    간단히 요약해서 알려주세요.
-                    """
-            }
-        ]
+                        **Important Notes**:
+                        - For config files (plist, xcconfig, etc.): brief check only
+                        - No unnecessary searches
+
+                        **Available Tools**:
+                        - get_pull_request: Retrieve PR information
+                        - get_file_content: View complete file contents
+                        - search_code: Search codebase
+
+                        **Call tools multiple times if needed for thorough investigation!**
+
+                        **Respond in Korean for the final review.**
+                        """
+                    }
+                ]
         
         # Claude 실행
         response = self._call_claude_with_tools(messages)
@@ -50,11 +65,25 @@ class CodeReviewer:
         print(f"{'='*60}\n")
         print(response)
         
+
+        print(f"\n{'='*60}")
+
+        formatted_review = f"""## 🤖 AI Code Review
+
+                            {response}
+
+                            ---
+                            *이 리뷰는 Claude + MCP로 자동 생성되었습니다.* 
+                            """
+        
+        self.github_mcp.post_review_comment(repo, pr_number, formatted_review)
+        print(f"{'='*60}\n")
+    
         return response
     
     def _call_claude_with_tools(self, messages: list) -> str:
         # GitHub MCP 도구 등록
-        tools = self.github_mcp.tools
+        tools = self.github_mcp._register_tools()
         
         # 대화 루프 시작
         while True:
@@ -85,20 +114,33 @@ class CodeReviewer:
                         tool_input = block.input
                         
                         print(f"   📌 {tool_name} 호출")
-                        
-                        # GitHub MCP로 도구 실행
-                        result = self.github_mcp.get_pull_request(
-                            tool_input["repo"],
-                            tool_input["pr_number"]
-                        )
-                        
+
                         # 결과를 Claude에게 다시 전달
+                        if tool_name == "get_pull_request":
+                            result = self.github_mcp.get_pull_request(
+                                tool_input["repo"],
+                                tool_input["pr_number"]
+                            )
+                        elif tool_name == "get_file_content":
+                            result = self.github_mcp.get_file_content(
+                                tool_input["repo"],
+                                tool_input["path"],
+                                tool_input.get("ref", "main")
+                            )
+                        elif tool_name == "search_code":
+                            result = self.github_mcp.search_code(
+                                tool_input["repo"],
+                                tool_input["query"]
+                            )
+                        else:
+                            result = {"error": f"Unknown tool: {tool_name}"}
+
                         tool_results.append({
                             "type": "tool_result",
                             "tool_use_id": block.id,
-                            "content": str(result)
+                            "content": json.dumps(result, ensure_ascii=False)
                         })
-                
+
                 # 대화 히스토리 업데이트
                 messages.append({"role": "assistant", "content": response.content})
                 messages.append({"role": "user", "content": tool_results})
