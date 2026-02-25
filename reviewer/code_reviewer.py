@@ -106,7 +106,7 @@ class CodeReviewer:
         while True:
             response = self.claude.messages.create(
                 model=self.model,
-                max_tokens=2000,
+                max_tokens=30000,
                 tools=tools,
                 messages=messages
             )
