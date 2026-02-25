@@ -106,9 +106,10 @@ class CodeReviewer:
         while True:
             response = self.claude.messages.create(
                 model=self.model,
-                max_tokens=30000,
+                max_tokens=20000,
                 tools=tools,
-                messages=messages
+                messages=messages,
+                timeout=600.0
             )
             
             if response.stop_reason == "end_turn":
