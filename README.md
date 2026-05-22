@@ -3,6 +3,7 @@
 > AI-powered Pull Request code review using Claude + MCP
 
 Claude와 GitHub MCP를 활용한 자동 PR 코드 리뷰 GitHub Action입니다.
+Anthropic API Key가 필요합니다.
 
 ## ✨ 주요 기능
 
@@ -88,6 +89,8 @@ Info.plist에 iOS 18 호환성 설정 추가
 LGTM 👍
 ```
 
+<img width="891" height="769" alt="image" src="https://github.com/user-attachments/assets/f5f00ff9-e6a6-4c26-ac65-e920cee900b5" />
+
 ## ⚙️ 고급 설정
 
 ### 커스텀 프롬프트 파일 경로 지정
@@ -98,10 +101,6 @@ LGTM 👍
     custom-prompt-file: 'docs/review-guide.md'
 ```
 
-## 💰 비용
-
-- PR당 약 $0.05-0.20 (Claude API 사용료)
-- 월 50개 PR 기준: $2.5-10
 
 ## 🛠️ 개발
 
@@ -122,9 +121,6 @@ EOF
 python reviewer/code_reviewer.py
 ```
 
-## 📝 라이선스
-
-MIT License
 
 ## 👤 Author
 
